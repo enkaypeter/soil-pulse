@@ -1,0 +1,12 @@
+#Enable SPI interface
+sudo raspi-config
+
+#Install Python Libraries for SPI
+sudo apt-get update
+sudo apt-get install python3-pip
+pip3 install spidev RPi.GPIO
+
+#spidev approach
+sudo apt update
+sudo apt install python3-pip
+pip3 install spidev
