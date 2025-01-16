@@ -10,3 +10,12 @@ pip3 install spidev RPi.GPIO
 sudo apt update
 sudo apt install python3-pip
 pip3 install spidev
+
+
+
+LED Orientation (Polarity)
+
+LEDs have a positive (anode) and negative (cathode) lead.
+The longer leg is usually the anode (positive), and it should connect to the GPIO pin (through a resistor).
+The shorter leg is usually the cathode (negative), and it should go to GND.
+If you insert the LED backwards, it will not light.
