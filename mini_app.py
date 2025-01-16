@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-app = Flask(__name__)
+mini_app = Flask(__name__)
 
 CORS(app)
 
@@ -32,7 +32,42 @@ def init_db():
         )
         conn.commit()
 
-@app.route("/history", methods=["GET"])
+@mini_app.route("/record", methods=["POST"])
+def record_soil_reading():
+    """
+    Accept soil reading payload via POST and save to the database.
+    """
+    data = request.get_json()
+    required_fields = ["timestamp", "sensor_pin", "reading", "state"]
+
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Missing required field: {field}"}), 400
+
+    try:
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO soil_readings (timestamp, sensor_pin, reading, state)
+                VALUES (?, ?, ?, ?)
+                """,
+                (
+                    data["timestamp"],
+                    data["sensor_pin"],
+                    data["reading"],
+                    data["state"],
+                ),
+            )
+            conn.commit()
+
+        return jsonify({"message": "Soil reading recorded successfully"}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@mini_app.route("/history", methods=["GET"])
 def history():
     """
     Returns all recorded soil readings from the DB in JSON.
@@ -60,7 +95,7 @@ def history():
     return jsonify(results)
 
 if __name__ == "__main__":
-  with app.app_context():
+  with mini_app.app_context():
     init_db()
 
-  app.run(host="0.0.0.0", port=5000, debug=True)
+  mini_app.run(host="0.0.0.0", port=5000, debug=True)
